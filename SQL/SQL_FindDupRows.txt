@@ -1,0 +1,7 @@
+SELECT n1.* 
+FROM myTable n1
+INNER JOIN myTable n2 
+ON n2.repeatedCol = n1.repeatedCol
+WHERE n1.id <> n2.id
+
+http://stackoverflow.com/questions/2112618/finding-duplicate-rows-in-sql-server

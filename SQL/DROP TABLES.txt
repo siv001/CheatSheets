@@ -1,0 +1,13 @@
+/*DROP TABLES IN RESPECTIVE SCHEMA*/
+BEGIN
+  FOR cur IN
+  (SELECT owner,
+    table_name
+  FROM ALL_TABLES
+  WHERE owner    = 'ODI_STAGE'--:OBJECT_OWNER
+  AND TABLE_NAME LIKE 'ITEM_%'--:OBJECT_NAME
+  )
+  LOOP
+    EXECUTE immediate 'DROP TABLE '||cur.owner||'.'||cur.table_name||'';
+  END LOOP;
+END;

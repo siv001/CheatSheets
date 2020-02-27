@@ -1,0 +1,16 @@
+# Import Cert
+keytool -import -alias culclsoa02 -file C:\Java\JDK7\jre\lib\security\Old_sbx.cer -keystore cacerts -storepass changeit
+
+List certs :
+keytool -keystore cacerts -storepass changeit -list -alias culclsoa02.ad.charming.com 
+
+Delete Cert Command:
+keytool -delete -keystore cacerts -storepass changeit -alias culclsoa02.ad.charming.com
+
+
+List all certs: 
+
+keytool -keystore cacerts -storepass changeit -list -alias culclsoa02.ad.charming.com
+
+Axis2 : WSDL2JAVA command
+wsdl2java -uri I:\CustomerService.wsdl -o axis2 -d adb -s

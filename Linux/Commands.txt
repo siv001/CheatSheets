@@ -1,0 +1,35 @@
+To rename files in Bulk :
+for i in *NEW; do mv -i $i `basename $i NEW`; done
+
+To find files larger than some size
+find /fmw_jst/JusticePOS/Foundation -name USPROMOFILE.REP -type f -size +200 -printf "%s:%h%f\n" |wc -l
+
+Top Command every 10 mins 
+while true
+do
+    rurrent_time=$(date "+%Y.%m.%d-%H:%M:%S")
+    top -n 1 -b > top-output.txt_$rurrent_time
+  sleep 600
+done
+
+
+Top Command every 10 mins 
+while true
+do
+    current_time=$(date "+%Y.%m.%d-%H:%M:%S")
+     /usr/java/jdk1.7.0_45/bin/jmap -heap 8561 > jmap_$current_time.txt
+  sleep 600
+done
+
+To find String in GUNZIP files and output filename
+
+find . -name "*.gz" -exec zgrep "pattern" /dev/null \{\} \;
+
+
+Copy files from filenames in list.txt 
+cp $(<list.txt) new_folder
+
+
+Copy files that are created in last 60 mins. to folder ./Last60Mins/ 
+find ./ -type f -mmin -60  -exec cp -pf {} ./Last60Mins/ \;
+

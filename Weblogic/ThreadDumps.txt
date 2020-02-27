@@ -1,0 +1,17 @@
+From Command line : 
+
+Step 1 : Open a command Prompt (Shell Prompt) and then move to the <BEA_BOME>/<WL_HOME/server/bin directory and then run the following Script
+
+. ./setWLSEnv.sh
+
+NOTE: There are two Dots before the Script separated by a Single Space... First Dot represents that set the environment in the Current Shell....and Second Dot represents that pick the Script from current Directory
+
+
+Step 2 : Run 'java weblogic.Admin -url localhost:7001 -username weblogic -password welcome1 THREAD_DUMP'
+
+
+java weblogic.Admin -url l00ulascosb01.corp.local:6012 -username weblogic -password ascen@qac0m THREAD_DUMP
+
+Thread DUMPs on Weblogic with PID: 
+ step 1: ps -eaf|grep osb_server1
+ step 2: /usr/java/jdk1.7.0_45/bin/jstack 25377  > /tmp/thread_dump

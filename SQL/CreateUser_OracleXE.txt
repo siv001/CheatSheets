@@ -1,0 +1,163 @@
+Database Tutorial
+Course Tutorial Site
+Configure Oracle 10g XE
+with 6 comments
+
+Here are the command-line steps to create your own database and user. It also shows you how to grant privileges to the new user on only their databases.
+
+You connect as the administrative user by calling the client-side sqlplus program, like the following (assumes you set the SYSTEM user password to cangetin). You typically don’t need to provide the TNS listener service alias when you connect on a local machine, at least on the Windows operating system.
+C:\Class\Oracle> sqlplus system/cangetin@xe
+There’s an alternative to this syntax that prevents disclosing your password during the log on process. It is this:
+
+C:\Class\Oracle> sqlplus system@xe
+Enter password:
+Oracle provides you with the ability to switch user without logging off then logging back in as the different user. Let’s say you want to connect to a plsql user while connected as the student user. You would use the CONNECT command to not disclose your password on the console:
+
+SQL> CONNECT plsql@xe
+Enter password:
+You can confirm you’re the administrative user by running the following SQL*Plus command:
+
+SQL> SHOW USER
+You create a new user in Oracle. All users are also scheme. A schema is a working and organizing unit in the database, it is different than a database in MySQL or SQL Server. A schema acts as a repository for the user to create and maintain database objects. You create a user like this:
+SQL> CREATE USER student IDENTIFIED BY student;
+You grant privileges to STUDENT user to act in the schema, like:
+SQL> GRANT CONNECT, resource, CREATE any VIEW TO STUDENT;
+You sign-off as the administrative user by typing QUIT, like
+SQL> QUIT;
+You sign-on as the restricted STUDENT user with the following syntax:
+C:\Class\Oracle> sqlplus STUDENT/STUDENT@xe
+You can confirm your the administrative user by running the following SQL*Plus command:
+
+SQL> SHOW USER
+Unlike MySQL, you don’t need to select a database to use one. You have access to the local schema when you sign-on to an Oracle user account, which means users are synonymous with databases. Actually, an Oracle database is composed of many scheme (the plural of schema, don’t you love Latin). The scheme can also work together as a group of applications to solve problems. This is part of what makes Oracle a power product.
+You could now create a table. Unlike MySQL, you can’t create a table that uses automatic numbering. Part of the reason for the difference is when they were created but a much larger reason lies in their purpose and audience. If we think of Oracle and MySQL like race cars, Oracle has a manual transmission and heavy duty components that you can leverage to win races. MySQL has more of an automatic transmission and lighter weight set of components. The engine can be transactional or non-transactional and you assemble it as required.
+
+Oracle let’s you mimic automatic numbering for a primary key (officially, known as a surrogate key because it doesn’t contain any of the data columns). You do this through three steps: (1) you create the table, (2) you create a sequence, and (3) you create a database trigger. All of these are in the next scripting blocks.
+
+You create a TABLE with the following syntax (a NUMBER is an Oracle numeric type that can contain up to 38 digits):
+
+1
+2
+3
+CREATE TABLE sample ( sample_id   NUMBER     NOT NULL
+                    , sample_text VARCHAR2(20)
+                    , CONSTRAINT sample_pk PRIMARY KEY (sample_id));
+You create a SEQUENCE that starts with 1 and increments by 1 with the following:
+
+CREATE SEQUENCE sample_seq;
+You create a TRIGGER that calls the SEQUENCE and inserts it into the TABLE:
+
+1
+2
+3
+4
+5
+6
+7
+CREATE OR REPLACE TRIGGER BI_SAMPLE
+BEFORE INSERT ON SAMPLE
+FOR EACH ROW
+BEGIN  
+  SELECT SAMPLE_SEQ.NEXTVAL INTO :NEW.SAMPLE_ID FROM dual;
+END;
+/
+MySQL and SQL Server let you insert multiple row values with the VALUES clause but Oracle doesn’t. You must write separate INSERT statements in Oracle or use a subquery, which is a bit beyond where we’re at now. You can then insert five rows like this:
+
+INSERT INTO sample (sample_text) VALUES ('One');
+INSERT INTO sample (sample_text) VALUES ('Two');
+INSERT INTO sample (sample_text) VALUES ('Three');
+INSERT INTO sample (sample_text) VALUES ('Four');
+INSERT INTO sample (sample_text) VALUES ('Five');
+You should now make those inserted records permanent by saving the values. You do that with a COMMIT; statement, like
+
+COMMIT;
+You can query the results with a SELECT statement:
+
+SELECT * FROM sample;
+You would see these results (column width are set by the internally stored column sizes):
+
+ SAMPLE_ID SAMPLE_TEXT
+---------- --------------------
+         1 One
+         2 Two
+         3 Three
+         4 Four
+         5 Five
+You can also format the output in SQL*Plus because it was originally a report writer. The following two commands would let you format numeric and string columns. The pipe below lets you set a line break in the title. You can find more about these techniques by reading the SQL*Plus® User’s Guide and Reference  or the crib notes version, SQL*Plus® Quick Reference .
+
+COLUMN sample_id   FORMAT 9,999 HEADING "Sample|ID"
+COLUMN sample_text FORMAT A6    HEADING "Sample|Text"
+It produces the final output:
+
+Sample Sample
+    ID Text
+------ ------
+     1 One
+     2 Two
+     3 Three
+     4 Four
+     5 Five
+You can also describe the structure of the table after you create it. You DESCRIBE the sample table by doing the following:
+SQL> DESCRIBE sample;
+You should see the following display:
+
+ Name                                      NULL?    TYPE
+ ----------------------------------------- -------- --------------
+ SAMPLE_ID                                 NOT NULL NUMBER
+ SAMPLE_TEXT                                        VARCHAR2(20)
+Alternatively, you could place those commands (minus any “SQL>” or line number) in a file and run the file from the command-line. This allows you to create what production folks call a re-runnable script. A re-runnable script works whether something is already there as well as when nothing is there.
+
+-- Split standard out, and write a log file to the absolute directory.
+SPOOL C:\DATA\sample.txt
+ 
+-- Run code, conditionally drop the table, which drops all dependents in Oracle, like indexes and triggers.
+BEGIN
+  FOR i IN (SELECT object_name
+            ,      object_type
+            FROM   user_objects
+            WHERE  object_name IN ('SAMPLE','SAMPLE_SEQ')) LOOP
+    IF i.object_type = 'TABLE' THEN
+      EXECUTE IMMEDIATE 'DROP TABLE '||i.object_name||' CASCADE CONSTRAINTS';
+    ELSE
+      EXECUTE IMMEDIATE 'DROP SEQUENCE '||i.object_name;
+    END IF;
+  END LOOP;
+END;
+/
+ 
+-- Create table.
+CREATE TABLE sample
+( sample_id   NUMBER     NOT NULL
+, sample_text VARCHAR2(20)
+, CONSTRAINT sample_pk PRIMARY KEY (sample_id));
+ 
+-- Create sequence.
+CREATE SEQUENCE sample_seq;
+ 
+-- Create automatic numbering database trigger.
+CREATE OR REPLACE TRIGGER BI_SAMPLE
+BEFORE INSERT ON SAMPLE
+  FOR EACH ROW
+BEGIN  
+   SELECT SAMPLE_SEQ.NEXTVAL INTO :NEW.SAMPLE_ID FROM dual;
+END;
+/
+ 
+-- Insert 5 rows using an override signature for pseudo-automatic numbering sequence.
+INSERT INTO sample (sample_text) VALUES ('One');
+INSERT INTO sample (sample_text) VALUES ('Two');
+INSERT INTO sample (sample_text) VALUES ('Three');
+INSERT INTO sample (sample_text) VALUES ('Four');
+INSERT INTO sample (sample_text) VALUES ('Five');
+ 
+-- Make the data inserts permanent.
+COMMIT;
+ 
+-- Query the data.
+SELECT * FROM sample;
+ 
+-- Close the log file.
+SPOOL OFF
+You can then save this as a file sample.sql in the C:\DATA directory, and run it like this from within the SQL*Plus environment:
+
+SQL> @C:\DATA\sample.SQL

@@ -1,0 +1,1 @@
+if you use weblogic debug flag -Dweblogic.debug.DebugJDBCSQL you will be able to trace the SQL which is actually being executed

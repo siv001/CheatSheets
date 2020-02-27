@@ -1,0 +1,1 @@
+/usr/java/jdk1.7.0_45/bin/jmap -dump:format=b,file=/tmp/mymemorydump.hprof 16205

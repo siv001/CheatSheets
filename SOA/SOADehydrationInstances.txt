@@ -1,0 +1,10 @@
+Below are SQL statements  that will be executed as part of providing proof of purge instances
+•	select count(1) from cube_instance
+
+•	select count(1) from composite_instance
+
+•	select count(1) from audit_trail
+
+•	select count(1) from audit_details
+
+•	select count(1) from xml_document

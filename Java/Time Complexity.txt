@@ -1,0 +1,6 @@
+Time Complexity would be as follows
+
+O(1) for each initialization
+O(n) for each loop
+O(n^2) for each nested loop
+O(n^3) for if condition within nested loop
