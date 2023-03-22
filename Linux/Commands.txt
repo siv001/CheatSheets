@@ -33,3 +33,6 @@ cp $(<list.txt) new_folder
 Copy files that are created in last 60 mins. to folder ./Last60Mins/ 
 find ./ -type f -mmin -60  -exec cp -pf {} ./Last60Mins/ \;
 
+linux command to search for text in all jar files in current directpry and all subfolders 
+find . -name "*.jar" -exec grep "search_text" {} \; -print
+
